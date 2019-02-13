@@ -1,5 +1,5 @@
 {
-  "name": "node-extension",
+  "name": "windows-api",
   "version": "0.0.1",
   "description": "A wrapper for some of Windows APIs",
   "keywords": [
