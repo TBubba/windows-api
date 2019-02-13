@@ -1,6 +1,10 @@
 Windows-API
 ===========
 
+```
+npm i windows-api
+```
+
 About
 -----
 
