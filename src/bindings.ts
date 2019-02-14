@@ -47,20 +47,21 @@ export function moveWindow(windowHandle: number, x: number, y: number, width: nu
  * Retrieves the dimensions of the bounding rectangle of the specified window.
  * The dimensions are given in screen coordinates that are relative to the upper-
  * left corner of the screen.
+ * (Wrapper of "GetWindowRect" from "User32")
  * @param windowHandle A handle to the window.
  * @returns If the function succeeds, the return value is the bounding rectangle of the window.
  *          If the function fails, the return value is undefined. To get extended error information, call GetLastError.
  */
 export function getWindowRect(windowHandle: number): Rect | undefined {
   return addon.GetWindowRect(windowHandle);
- }
+}
 
 /**
- * Copies the text of the specified window's title bar (if it has one) into a buffer. If the specified window is a control, the text
- * of the control is copied. However, GetWindowText cannot retrieve the text of a control in another application.
+ * Get the text of the specified window's title bar (if it has one). If the specified window is a control, the text
+ * of the control is fetched. However, GetWindowText cannot retrieve the text of a control in another application.
  * (Wrapper of "GetWindowTextA" from "User32")
  * @param windowHandle A handle to the window or control containing the text.
- * @returns 
+ * @returns The window's or controls text.
  */
 export function getWindowText(windowHandle: number): string {
   return addon.GetWindowText(windowHandle);
