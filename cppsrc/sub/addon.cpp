@@ -81,6 +81,31 @@ Napi::Boolean addon::Wrap_MoveWindow(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, result);
 }
 
+Napi::Value addon::Wrap_GetWindowRect(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  bool error = false;
+  if (info.Length() < 1)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
+  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
+  if (error) { return Napi::Object::New(env); }
+
+  RECT rect;
+  bool result = GetWindowRect(
+    (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>()),
+    &rect
+  );
+
+  if (!result) { return env.Undefined(); }
+  
+  Napi::Object object = Napi::Object::New(env);
+  object["left"]   = Napi::Number::New(env, rect.left);
+  object["top"]    = Napi::Number::New(env, rect.top);
+  object["right"]  = Napi::Number::New(env, rect.right);
+  object["bottom"] = Napi::Number::New(env, rect.bottom);    
+
+  return object;
+}
+
 Napi::String addon::Wrap_GetWindowText(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
@@ -156,6 +181,7 @@ Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("EnumWindows", Napi::Function::New(env, addon::Wrap_EnumWindows));
   exports.Set("GetWindowProcessId", Napi::Function::New(env, addon::GetWindowProcessId));
   exports.Set("MoveWindow", Napi::Function::New(env, addon::Wrap_MoveWindow));
+  exports.Set("GetWindowRect", Napi::Function::New(env, addon::Wrap_GetWindowRect));
   exports.Set("GetWindowText", Napi::Function::New(env, addon::Wrap_GetWindowText));
   exports.Set("SetWindowText", Napi::Function::New(env, addon::Wrap_SetWindowText));
   exports.Set("ShowWindow", Napi::Function::New(env, addon::Wrap_ShowWindow));

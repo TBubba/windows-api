@@ -4,7 +4,7 @@ import * as windowsAPI from '../dist';
 runDemo();
 
 function runDemo() {
-  // Run MS-Paint, wait for it's window to appear, then move and resize it
+  // Run MS-Paint, wait for it's window to appear, then move and resize it and log its new position and size
   (async () => {
     const proc = spawn('C:/Windows/System32/mspaint.exe');
     const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid, 'Paint')));
@@ -14,6 +14,7 @@ function runDemo() {
       500, 500,
       800, 600
     );
+    console.log('Paint window\'s bounding rectangle:\n  ', windowsAPI.getWindowRect(window), '\n');
   })();
 
   // Run Notepad, wait for it's window to appear, set the windows text and maximize it

@@ -1,4 +1,4 @@
-import { EnumWindowsCallback, ShowWindowValue } from './interfaces';
+import { EnumWindowsCallback, ShowWindowValue, Rect } from './interfaces';
 
 const addon = require('bindings')('addon');
 
@@ -42,6 +42,18 @@ export function getWindowProcessId(windowHandle: number): number {
 export function moveWindow(windowHandle: number, x: number, y: number, width: number, height: number, repaint?: boolean): boolean {
   return addon.MoveWindow(windowHandle, x, y, width, height, repaint);
 }
+
+/**
+ * Retrieves the dimensions of the bounding rectangle of the specified window.
+ * The dimensions are given in screen coordinates that are relative to the upper-
+ * left corner of the screen.
+ * @param windowHandle A handle to the window.
+ * @returns If the function succeeds, the return value is the bounding rectangle of the window.
+ *          If the function fails, the return value is undefined. To get extended error information, call GetLastError.
+ */
+export function getWindowRect(windowHandle: number): Rect | undefined {
+  return addon.GetWindowRect(windowHandle);
+ }
 
 /**
  * Copies the text of the specified window's title bar (if it has one) into a buffer. If the specified window is a control, the text

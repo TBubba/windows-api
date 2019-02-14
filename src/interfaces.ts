@@ -28,3 +28,10 @@ export enum ShowWindowValue {
   /** Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread. */
   SW_FORCEMINIMIZE = 11,
 }
+
+export type Rect = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
