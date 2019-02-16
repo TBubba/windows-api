@@ -1,4 +1,4 @@
-import { EnumWindowsCallback, ShowWindowValue, Rect } from './interfaces';
+import { EnumWindowsCallback, ShowWindowValue, Rect, Input } from './interfaces';
 
 const addon = require('bindings')('addon');
 
@@ -110,4 +110,16 @@ export function getLastError(): number {
  */
 export function setLastError(errorCode: number): void {
   return addon.SetLastError(errorCode);
+}
+
+/**
+ * Synthesizes keystrokes, mouse motions, and button clicks.
+ * @param inputs Array of inputs. Each represents an event to be inserted into one of the input streams.
+ * @returns The function returns the number of events that it successfully inserted into the keyboard or mouse input stream. If the
+ *          function returns zero, the input was already blocked by another thread. To get extended error information, call GetLastError.
+ *          This function fails when it is blocked by UIPI. Note that neither GetLastError nor the return value will indicate the failure
+ *          was caused by UIPI blocking.
+ */
+export function sendInput(inputs: Input[]): number {
+  return addon.SendInput(inputs);
 }

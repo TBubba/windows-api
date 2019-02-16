@@ -1,6 +1,11 @@
 #include <cstdio>
 #include <windows.h>
+#include <vector>
 #include "addon.h"
+
+int getNumberOrDefault(Napi::Value val, int defVal = 0) {
+  return val.IsNumber() ? val.As<Napi::Number>().Int32Value() : defVal;
+}
 
 struct EnumWindowsCallbackParam {
   Napi::Function callback;
@@ -201,6 +206,76 @@ Napi::Value addon::Wrap_SetLastError(const Napi::CallbackInfo& info) {
   return env.Undefined();
 }
 
+Napi::Number addon::Wrap_SendInput(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsArray()) { error = Napi::Error::New(env, "First argument must be an array."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Number::New(env, 0);
+  }
+
+  Napi::Array args = info[0].As<Napi::Array>();
+  std::vector<INPUT> inputQueue;
+
+  int argsLength = args.Length();
+  for (int i = 0; i < argsLength; i++) {
+    Napi::Value argVal;
+    argVal = args[i];
+    if (!argVal.IsObject()) { error = Napi::Error::New(env, "All elements must be objects."); }
+    else {
+      Napi::Object arg = argVal.As<Napi::Object>();
+      if (!arg.Get("type").IsNumber()) { error = Napi::Error::New(env, "Property \"type\" is missing from input object."); }
+      else if (!arg.Get("input").IsObject()) { error = Napi::Error::New(env, "Property \"input\" is missing from input object."); }
+      else {
+        Napi::Object argInput = arg.Get("input").As<Napi::Object>();
+        INPUT input = { 0 };
+        Napi::Value val;
+        switch (arg.Get("type").As<Napi::Number>().Int32Value()) {
+          case INPUT_MOUSE:
+            input.type = INPUT_MOUSE;
+            input.mi.dx          = getNumberOrDefault(argInput["dx"]);
+            input.mi.dy          = getNumberOrDefault(argInput["dy"]);
+            input.mi.mouseData   = getNumberOrDefault(argInput["mouseData"]);
+            input.mi.dwFlags     = getNumberOrDefault(argInput["flags"]);
+            input.mi.time        = getNumberOrDefault(argInput["time"]);
+            input.mi.dwExtraInfo = getNumberOrDefault(argInput["extraInfo"]);
+            inputQueue.push_back(input);
+            break;
+          case INPUT_KEYBOARD:
+            input.type = INPUT_KEYBOARD;
+            input.ki.wVk         = getNumberOrDefault(argInput["vk"]);
+            input.ki.wScan       = getNumberOrDefault(argInput["scan"]);
+            input.ki.dwFlags     = getNumberOrDefault(argInput["flags"]);
+            input.ki.time        = getNumberOrDefault(argInput["time"]);
+            input.ki.dwExtraInfo = getNumberOrDefault(argInput["extraInfo"]);
+            inputQueue.push_back(input);
+            break;
+          case INPUT_HARDWARE:
+            input.type = INPUT_HARDWARE;
+            input.hi.uMsg    = getNumberOrDefault(argInput["msg"]);
+            input.hi.wParamL = getNumberOrDefault(argInput["paramL"]);
+            input.hi.wParamH = getNumberOrDefault(argInput["paramH"]);
+            inputQueue.push_back(input);
+            break;
+          default:
+            error = Napi::Error::New(env, "\"type\" is not a valid input type.");
+        }
+      }      
+    }
+    if (error) {
+      error.ThrowAsJavaScriptException();
+      return Napi::Number::New(env, 0);
+    }
+  }
+  
+  UINT result = SendInput(inputQueue.size(), &inputQueue[0], sizeof(INPUT));
+
+  return Napi::Number::New(env, result);
+}
+
 Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("EnumWindows", Napi::Function::New(env, addon::Wrap_EnumWindows));
   exports.Set("GetWindowProcessId", Napi::Function::New(env, addon::GetWindowProcessId));
@@ -211,5 +286,6 @@ Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("ShowWindow", Napi::Function::New(env, addon::Wrap_ShowWindow));
   exports.Set("GetLastError", Napi::Function::New(env, addon::Wrap_GetLastError));
   exports.Set("SetLastError", Napi::Function::New(env, addon::Wrap_SetLastError));
+  exports.Set("SendInput", Napi::Function::New(env, addon::Wrap_SendInput));
   return exports;
 }

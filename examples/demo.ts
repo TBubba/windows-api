@@ -3,9 +3,9 @@ import * as windowsAPI from '../dist';
 
 runDemo();
 
-function runDemo() {
+async function runDemo() {
   // Run MS-Paint, wait for it's window to appear, then move and resize it and log its new position and size
-  (async () => {
+  await (async () => {
     const proc = spawn('C:/Windows/System32/mspaint.exe');
     const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid, 'Paint')));
     console.log(`Paint | Handle : ${window} | Text: "${windowsAPI.getWindowText(window)}"\n`);
@@ -16,18 +16,33 @@ function runDemo() {
     );
     console.log('Paint window\'s bounding rectangle:\n  ', windowsAPI.getWindowRect(window), '\n');
   })();
-
-  // Run Notepad, wait for it's window to appear, set the windows text and maximize it
-  (async () => {
+  
+  // Run Notepad, Wait for it's window to appear, Set the windows text and maximize the window,
+  // Send key presses to the current window (hopefully the notepad window)
+  await (async () => {
     const proc = spawn('C:/Windows/System32/notepad.exe');
     const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid)));
     console.log(`Notepad | Handle : ${window} | Text: "${windowsAPI.getWindowText(window)}"\n`);
     windowsAPI.setWindowText(window, 'Not Notepad');
     windowsAPI.showWindow(window, windowsAPI.ShowWindowValue.SW_SHOWMAXIMIZED);
+    await wait(500);
+    await sendKeyPresses([
+      windowsAPI.VK.T,
+      windowsAPI.VK.E,
+      windowsAPI.VK.S,
+      windowsAPI.VK.T,
+      windowsAPI.VK.SPACE,
+      windowsAPI.VK.O,
+      windowsAPI.VK.U,
+      windowsAPI.VK.T,
+      windowsAPI.VK.P,
+      windowsAPI.VK.U,
+      windowsAPI.VK.T,
+    ], 30);
   })();
 
   // Set the last error code, then retrieve it
-  (async () => {
+  await (async () => {
     const errorCode = 123;
     console.log(`Setting last error code to: ${errorCode}`);
     windowsAPI.setLastError(errorCode);
@@ -35,7 +50,7 @@ function runDemo() {
   })();
 
   // Count all windows and list some of their texts in the console
-  (async () => {
+  await (async () => {
     const handles: number[] = [];
     windowsAPI.enumWindows(handle => {
       handles.push(handle);
@@ -53,7 +68,7 @@ function runDemo() {
       `Number of windows: ${handles.length}\n`+
       `Some Window Texts: [\n${texts}\n]\n`
     );
-  })();
+  });
 };
 
 /**
@@ -130,10 +145,35 @@ function waitForWindow(getWindowHandle: () => number, interval: number = 50, tim
 
 /**
  * Wait for an amount of time.
- * @param time Time to wait (in milliseconds)
+ * @param time Time to wait (in milliseconds).
  */
-export function wait(time: number): Promise<void> {
+function wait(time: number = 0): Promise<void> {
   return new Promise<void>(res => {
     setTimeout(res, time);
   });
+}
+
+/**
+ * Send "key presses" with a small delay in-between each press.
+ * @param keys Keys to "press" and "release" (in order).
+ * @param delay Delay between each press and release (in milliseconds).
+ */
+async function sendKeyPresses(keys: windowsAPI.VK[], delay: number = 1) {
+  const last = keys.length - 1;
+  for (let i = 0; i <= last; i++) {
+    const key = keys[i];
+    windowsAPI.sendInput([{
+      type: windowsAPI.InputType.INPUT_KEYBOARD,
+      input: { vk: key }
+    }]);
+    await wait(delay);
+    windowsAPI.sendInput([{
+      type: windowsAPI.InputType.INPUT_KEYBOARD,
+      input: {
+        vk: key,
+        flags: windowsAPI.KEYEVENTF.KEYUP
+      }
+    }]);
+    if (i !== last) { await wait(delay); }
+  }
 }

@@ -13,6 +13,7 @@ namespace addon {
   Napi::Boolean Wrap_ShowWindow(const Napi::CallbackInfo& info);
   Napi::Number Wrap_GetLastError(const Napi::CallbackInfo& info);
   Napi::Value Wrap_SetLastError(const Napi::CallbackInfo& info);
+  Napi::Number Wrap_SendInput(const Napi::CallbackInfo& info);
   
   Napi::Object Init(Napi::Env env, Napi::Object exports);
 }
