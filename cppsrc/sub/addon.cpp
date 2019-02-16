@@ -21,10 +21,13 @@ BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
 Napi::Boolean addon::Wrap_EnumWindows(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   
-  bool error = false;
-  if (info.Length() < 1)     { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsFunction()) { error = true; Napi::Error::New(env, "First argument must be a function.").ThrowAsJavaScriptException(); }
-  if (error) { return Napi::Boolean::New(env, false); }
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsFunction()) { error = Napi::Error::New(env, "First argument must be a function."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
 
   EnumWindowsCallbackParam args = {
     info[0].As<Napi::Function>(), // callback
@@ -39,10 +42,13 @@ Napi::Boolean addon::Wrap_EnumWindows(const Napi::CallbackInfo& info) {
 Napi::Number addon::GetWindowProcessId(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   
-  bool error = false;
-  if (info.Length() < 1)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (error) { return Napi::Number::New(env, 0); }
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Number::New(env, 0);
+  }
 
   DWORD lpdwProcessId;
   DWORD threadId = GetWindowThreadProcessId((HWND)reinterpret_cast<void*>((int)info[0].As<Napi::Number>()), &lpdwProcessId);
@@ -56,18 +62,21 @@ Napi::Boolean addon::Wrap_MoveWindow(const Napi::CallbackInfo& info) {
   
   bool repaint = TRUE;
 
-  bool error = false;
-  if (info.Length() < 5)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (!info[1].IsNumber()) { error = true; Napi::Error::New(env, "Second argument must be a number.").ThrowAsJavaScriptException(); }
-  if (!info[2].IsNumber()) { error = true; Napi::Error::New(env, "Third argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (!info[3].IsNumber()) { error = true; Napi::Error::New(env, "Fourth argument must be a number.").ThrowAsJavaScriptException(); }
-  if (!info[4].IsNumber()) { error = true; Napi::Error::New(env, "Fifth argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (!info[5].IsUndefined()) {
+  Napi::Error error;
+  if (info.Length() < 5) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  else if (!info[1].IsNumber()) { error = Napi::Error::New(env, "Second argument must be a number."); }
+  else if (!info[2].IsNumber()) { error = Napi::Error::New(env, "Third argument must be a number."); }
+  else if (!info[3].IsNumber()) { error = Napi::Error::New(env, "Fourth argument must be a number."); }
+  else if (!info[4].IsNumber()) { error = Napi::Error::New(env, "Fifth argument must be a number."); }
+  else if (!info[5].IsUndefined()) {
     if (info[5].IsBoolean()) { repaint = info[5].As<Napi::Boolean>(); }
-    else { error = true; Napi::Error::New(env, "Sixth argument must be a boolean." ).ThrowAsJavaScriptException(); }
+    else { error = Napi::Error::New(env, "Sixth argument must be a boolean."); }
   }
-  if (error) { return Napi::Boolean::New(env, false); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
   
   bool result = MoveWindow(
     (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>()),
@@ -84,10 +93,13 @@ Napi::Boolean addon::Wrap_MoveWindow(const Napi::CallbackInfo& info) {
 Napi::Value addon::Wrap_GetWindowRect(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  bool error = false;
-  if (info.Length() < 1)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (error) { return Napi::Object::New(env); }
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Object::New(env);
+  }
 
   RECT rect;
   bool result = GetWindowRect(
@@ -109,10 +121,13 @@ Napi::Value addon::Wrap_GetWindowRect(const Napi::CallbackInfo& info) {
 Napi::String addon::Wrap_GetWindowText(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  bool error = false;
-  if (info.Length() < 1)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (error) { return Napi::String::New(env, ""); }
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::String::New(env, "");
+  }
 
   TCHAR buff[512];
   int result = GetWindowTextA(
@@ -127,11 +142,14 @@ Napi::String addon::Wrap_GetWindowText(const Napi::CallbackInfo& info) {
 Napi::Boolean addon::Wrap_SetWindowText(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  bool error = false;
-  if (info.Length() < 2)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (!info[1].IsString()) { error = true; Napi::Error::New(env, "Second argument must be a string." ).ThrowAsJavaScriptException(); }
-  if (error) { return Napi::Boolean::New(env, false); }
+  Napi::Error error;
+  if (info.Length() < 2) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  else if (!info[1].IsString()) { error = Napi::Error::New(env, "Second argument must be a string."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
 
   int result = SetWindowTextA(
     (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>()),
@@ -144,11 +162,14 @@ Napi::Boolean addon::Wrap_SetWindowText(const Napi::CallbackInfo& info) {
 Napi::Boolean addon::Wrap_ShowWindow(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  bool error = false;
-  if (info.Length() < 2)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (!info[1].IsNumber()) { error = true; Napi::Error::New(env, "Second argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (error) { return Napi::Boolean::New(env, false); }
+  Napi::Error error;
+  if (info.Length() < 2) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  else if (!info[1].IsNumber()) { error = Napi::Error::New(env, "Second argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(env, false);
+  }
 
   bool result = ShowWindow(
     (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>()),
@@ -165,10 +186,13 @@ Napi::Number addon::Wrap_GetLastError(const Napi::CallbackInfo& info) {
 Napi::Value addon::Wrap_SetLastError(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  bool error = false;
-  if (info.Length() < 1)   { error = true; Napi::Error::New(env, "Too few arguments.").ThrowAsJavaScriptException(); }
-  if (!info[0].IsNumber()) { error = true; Napi::Error::New(env, "First argument must be a number." ).ThrowAsJavaScriptException(); }
-  if (error) { return env.Undefined(); }
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
 
   SetLastError(
     (int)info[0].As<Napi::Number>()
