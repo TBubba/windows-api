@@ -123,3 +123,27 @@ export function setLastError(errorCode: number): void {
 export function sendInput(inputs: Input[]): number {
   return addon.SendInput(inputs);
 }
+
+/**
+ * Retrieves a handle to the foreground window (the window with which the user is currently working). The system assigns a slightly
+ * higher priority to the thread that creates the foreground window than it does to other threads.
+ * (Wrapper of "GetForegroundWindow" from "User32")
+ * @returns The return value is a handle to the foreground window. The foreground window can be NULL in certain circumstances, such
+ *          as when a window is losing activation.
+ */
+export function getForegroundWindow(): boolean {
+  return addon.GetForegroundWindow();
+}
+
+/**
+ * Brings the thread that created the specified window into the foreground and activates the window. Keyboard input is directed to the
+ * window, and various visual cues are changed for the user. The system assigns a slightly higher priority to the thread that created
+ * the foreground window than it does to other threads.
+ * (Wrapper of "SetForegroundWindow" from "User32")
+ * @param windowHandle A handle to the window that should be activated and brought to the foreground.
+ * @returns If the window was brought to the foreground, the return value is true.
+ *          If the window was not brought to the foreground, the return value is false.
+ */
+export function setForegroundWindow(windowHandle: number): number {
+  return addon.SetForegroundWindow(windowHandle);
+}

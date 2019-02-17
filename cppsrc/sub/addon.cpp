@@ -276,6 +276,28 @@ Napi::Number addon::Wrap_SendInput(const Napi::CallbackInfo& info) {
   return Napi::Number::New(env, result);
 }
 
+Napi::Number addon::Wrap_GetForegroundWindow(const Napi::CallbackInfo& info) {
+  return Napi::Number::New(info.Env(), (int)GetForegroundWindow());
+}
+
+Napi::Boolean addon::Wrap_SetForegroundWindow(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(info.Env(), false);
+  }
+
+  bool result = SetForegroundWindow(
+    (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>())
+  );
+
+  return Napi::Boolean::New(info.Env(), result);
+}
+
 Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("EnumWindows", Napi::Function::New(env, addon::Wrap_EnumWindows));
   exports.Set("GetWindowProcessId", Napi::Function::New(env, addon::GetWindowProcessId));
@@ -287,5 +309,7 @@ Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("GetLastError", Napi::Function::New(env, addon::Wrap_GetLastError));
   exports.Set("SetLastError", Napi::Function::New(env, addon::Wrap_SetLastError));
   exports.Set("SendInput", Napi::Function::New(env, addon::Wrap_SendInput));
+  exports.Set("GetForegroundWindow", Napi::Function::New(env, addon::Wrap_GetForegroundWindow));
+  exports.Set("SetForegroundWindow", Napi::Function::New(env, addon::Wrap_SetForegroundWindow));
   return exports;
 }
