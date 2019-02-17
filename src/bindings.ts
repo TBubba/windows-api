@@ -114,6 +114,7 @@ export function setLastError(errorCode: number): void {
 
 /**
  * Synthesizes keystrokes, mouse motions, and button clicks.
+ * (Wrapper of "SendInput" from "User32")
  * @param inputs Array of inputs. Each represents an event to be inserted into one of the input streams.
  * @returns The function returns the number of events that it successfully inserted into the keyboard or mouse input stream. If the
  *          function returns zero, the input was already blocked by another thread. To get extended error information, call GetLastError.
