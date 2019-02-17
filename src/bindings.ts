@@ -148,3 +148,14 @@ export function getForegroundWindow(): number {
 export function setForegroundWindow(windowHandle: number): boolean {
   return addon.SetForegroundWindow(windowHandle);
 }
+
+/**
+ * Determines whether the specified window handle identifies an existing window.
+ * (Wrapper of "IsWindow" from "User32")
+ * @param windowHandle A handle to the window to be tested.
+ * @returns If the window handle identifies an existing window, the return value is true.
+ *          If the window handle does not identify an existing window, the return value is false.
+ */
+export function isWindow(windowHandle: number): boolean {
+  return addon.IsWindow(windowHandle);
+}
