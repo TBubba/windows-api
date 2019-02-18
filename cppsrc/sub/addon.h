@@ -17,6 +17,7 @@ namespace addon {
   Napi::Number Wrap_GetForegroundWindow(const Napi::CallbackInfo& info);
   Napi::Boolean Wrap_SetForegroundWindow(const Napi::CallbackInfo& info);
   Napi::Boolean Wrap_IsWindow(const Napi::CallbackInfo& info);
+  Napi::Boolean Wrap_DestroyWindow(const Napi::CallbackInfo& info);
   
   Napi::Object Init(Napi::Env env, Napi::Object exports);
 }

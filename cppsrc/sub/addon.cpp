@@ -316,6 +316,24 @@ Napi::Boolean addon::Wrap_IsWindow(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(info.Env(), result);
 }
 
+Napi::Boolean addon::Wrap_DestroyWindow(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  Napi::Error error;
+  if (info.Length() < 1) { error = Napi::Error::New(env, "Too few arguments."); }
+  else if (!info[0].IsNumber()) { error = Napi::Error::New(env, "First argument must be a number."); }
+  if (error) {
+    error.ThrowAsJavaScriptException();
+    return Napi::Boolean::New(info.Env(), false);
+  }
+
+  bool result = DestroyWindow(
+    (HWND)reinterpret_cast<int*>((int)info[0].As<Napi::Number>())
+  );
+
+  return Napi::Boolean::New(info.Env(), result);
+}
+
 Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("EnumWindows", Napi::Function::New(env, addon::Wrap_EnumWindows));
   exports.Set("GetWindowProcessId", Napi::Function::New(env, addon::GetWindowProcessId));
@@ -330,5 +348,6 @@ Napi::Object addon::Init(Napi::Env env, Napi::Object exports) {
   exports.Set("GetForegroundWindow", Napi::Function::New(env, addon::Wrap_GetForegroundWindow));
   exports.Set("SetForegroundWindow", Napi::Function::New(env, addon::Wrap_SetForegroundWindow));
   exports.Set("IsWindow", Napi::Function::New(env, addon::Wrap_IsWindow));
+  exports.Set("DestroyWindow", Napi::Function::New(env, addon::Wrap_DestroyWindow));
   return exports;
 }
