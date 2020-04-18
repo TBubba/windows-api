@@ -14,6 +14,7 @@
     "build": "tsc",
     "addon": "node-gyp rebuild",
     "demo": "npx ts-node ./examples/demo.ts",
+    "test": "npx jest",
     "publish": "npm run addon && npm run build && npm publish"
   },
   "author": "Jesper Gustafsson <JesperGustafssons@gmail.com> (https://bigbub.net)",
@@ -24,6 +25,9 @@
     "node-addon-api": "^1.6.2"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "jest": "^25.3.0",
+    "ts-jest": "^25.4.0",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.3"
   }
