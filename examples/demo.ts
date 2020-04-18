@@ -148,8 +148,8 @@ function waitForWindow(getWindowHandle: () => number, interval: number = 50, tim
  * @param time Time to wait (in milliseconds).
  */
 function wait(time: number = 0): Promise<void> {
-  return new Promise<void>(res => {
-    setTimeout(res, time);
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, time);
   });
 }
 

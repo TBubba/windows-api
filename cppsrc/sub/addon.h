@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <napi.h>
 
-
 namespace addon {
   Napi::Boolean Wrap_EnumWindows(const Napi::CallbackInfo& info);
   Napi::Number GetWindowProcessId(const Napi::CallbackInfo& info);
