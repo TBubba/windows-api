@@ -68,7 +68,7 @@ async function runDemo() {
       `Number of windows: ${handles.length}\n`+
       `Some Window Texts: [\n${texts}\n]\n`
     );
-  });
+  })();
 };
 
 /**
