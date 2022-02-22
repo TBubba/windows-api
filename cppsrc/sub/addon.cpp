@@ -14,11 +14,9 @@ struct EnumWindowsCallbackParam {
 
 BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
   EnumWindowsCallbackParam *args = (EnumWindowsCallbackParam*)lParam;
-  Napi::Value result = (*args).callback.MakeCallback(
-    (*args).env.Global(),
-    {
-      Napi::Number::New((*args).env, (double)reinterpret_cast<int>(hwnd))
-    }
+  Napi::Value result = args->callback.MakeCallback(
+    args->env.Global(),
+    { Napi::Number::New(args->env, (double)reinterpret_cast<int>(hwnd)) }
   );
   return (bool)result.ToBoolean();
 }
