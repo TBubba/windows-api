@@ -7,7 +7,7 @@ async function runDemo() {
   // Run MS-Paint, wait for it's window to appear, then move and resize it and log its new position and size
   await (async () => {
     const proc = spawn('C:/Windows/System32/mspaint.exe');
-    const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid, 'Paint')));
+    const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid!, 'Paint')));
     console.log(`Paint | Handle : ${window} | Text: "${windowsAPI.getWindowText(window)}"\n`);
     windowsAPI.moveWindow(
       window,
@@ -21,7 +21,7 @@ async function runDemo() {
   // Send key presses to the current window (hopefully the notepad window)
   await (async () => {
     const proc = spawn('C:/Windows/System32/notepad.exe');
-    const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid)));
+    const window = await waitForWindow(() => findWindowHandle(createPIDAndTextPredicate(proc.pid!)));
     console.log(`Notepad | Handle : ${window} | Text: "${windowsAPI.getWindowText(window)}"\n`);
     windowsAPI.setWindowText(window, 'Not Notepad');
     windowsAPI.showWindow(window, windowsAPI.ShowWindowValue.SW_SHOWMAXIMIZED);
